@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import logging
 import json
+import re
 import arrow
 from django.conf import settings
 from django.db.utils import IntegrityError
@@ -134,11 +135,37 @@ def parse_tweet(data=None):
         logger.critical("User creation / update failed, and I have no idea why!\n{}".format(no_clue))
         return False
 
+    '''
+    Tweets are a little more complicated than users, parsing wise;
+    some tweets will be truncated even if the truncated flag is false
+    because of retweets. However, the retweet flag will also be false.
+
+    Let's break the content and the creation_date variables out for clarity.
+    '''
+    creation_date = arrow.get(tweet['created_at'], 'ddd MMM D hh:mm:ss Z YYYY').datetime
+
+    keys = tweet.keys()  # Prevent multiple lookups.
+    if 'extended_tweet' in keys:
+        content = tweet['extended_tweet']['full_text']
+    elif 'retweeted_status' in keys and 'extended_tweet' in tweet['retweeted_status'].keys():
+        content = tweet['retweeted_status']['extended_tweet']['full_text']
+    else:
+        content = tweet['text']
+
+    # Let's clean up the source value, just in case we want to do some
+    # analytics on it later.
+    if re.match(r'.*i[p|P][ad|hone].*', tweet['source']):
+        source = 'iOS device'
+    elif re.match(r'.*[a|A]ndroid.*', tweet['source']):
+        source = 'Android device'
+    else:
+        source = 'Web Client'  # probably, unless it's a toaster
+
     Tweet.objects.update_or_create(
-        creation_date=arrow.get(tweet['created_at'], 'ddd MMM D hh:mm:ss Z YYYY').datetime,
+        creation_date=creation_date,
         tweet_id=tweet['id'],
-        content=tweet['text'],
-        source=tweet['source'],
+        content=content,
+        source=source,
         retweet_count=tweet['retweet_count'],
         favorite_count=tweet['favorite_count'],
         twitter_user=user

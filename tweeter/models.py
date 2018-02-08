@@ -27,7 +27,7 @@ class TwitterUser(models.Model):
         verbose_name_plural = 'Twitter Users'
 
     def __str__(self):
-        return self.user_id
+        return self.username
 
 
 class Tweet(models.Model):
@@ -36,7 +36,7 @@ class Tweet(models.Model):
     """
     creation_date = models.DateTimeField(blank=True, null=True)
     tweet_id = models.CharField(max_length=256)
-    content = models.CharField(max_length=200)
+    content = models.TextField(blank=True, null=True)
     source = models.CharField(max_length=256, blank=True, null=True)
     retweet_count = models.PositiveIntegerField(default=0)
     favorite_count = models.PositiveIntegerField(default=0)

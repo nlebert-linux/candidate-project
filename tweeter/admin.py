@@ -19,4 +19,16 @@ class TwitterUserAdmin(admin.ModelAdmin):
 
 @admin.register(Tweet)
 class TweetAdmin(admin.ModelAdmin):
-    pass
+    list_display = [
+        'tweet_id',
+        'twitter_user',
+        'creation_date',
+        'content',
+        'source',
+        'retweet_count',
+        'favorite_count'
+    ]
+
+    list_filter = ['source', ]
+
+    readonly_fields = ['content', ]
