@@ -13,7 +13,7 @@ class TweetInlineAdmin(admin.TabularInline):
 @admin.register(TwitterUser)
 class TwitterUserAdmin(admin.ModelAdmin):
     list_display = ['user_id', 'name', 'username', 'location', 'followers', 'friends']
-    list_filter = ['location', ]
+    list_filter = ['is_protected', 'is_verified']
     inlines = [TweetInlineAdmin, ]
 
 

@@ -20,7 +20,7 @@ class TwitterUser(models.Model):
     statuses = models.PositiveIntegerField(default=0)
     creation_date = models.DateTimeField()
     profile_image_url = models.URLField(blank=True, null=True)
-    language = models.CharField(max_length=2, blank=True, null=True)
+    language = models.CharField(max_length=10, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Twitter User'
